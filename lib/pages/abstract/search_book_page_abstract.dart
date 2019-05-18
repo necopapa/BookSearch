@@ -8,8 +8,8 @@ import 'package:test_app/widgets/BookCard.dart';
 import 'package:test_app/widgets/book_card_compact.dart';
 import 'package:test_app/widgets/book_card_minimalistic.dart';
 
-
-abstract class AbstractSearchBookState<T extends StatefulWidget> extends State<T> {
+abstract class AbstractSearchBookState<T extends StatefulWidget>
+    extends State<T> {
   List<Book> items = new List();
 
   final subject = new PublishSubject<String>();
@@ -18,28 +18,31 @@ abstract class AbstractSearchBookState<T extends StatefulWidget> extends State<T
 
   GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey();
 
-
   void _textChanged(String text) {
-    if(text.isEmpty) {
-      setState((){isLoading = false;});
+    if (text.isEmpty) {
+      setState(() {
+        isLoading = false;
+      });
       _clearList();
       return;
     }
-    setState((){isLoading = true;});
+    setState(() {
+      isLoading = true;
+    });
     _clearList();
-    Repository.get().getBooks(text)
-    .then((books){
+    Repository.get().getBooks(text).then((books) {
       setState(() {
         isLoading = false;
-        if(books.isOk()) {
+        if (books.isOk()) {
           items = books.body;
         } else {
-          scaffoldKey.currentState.showSnackBar(new SnackBar(content: new Text("Something went wrong, check your internet connection")));
+          scaffoldKey.currentState.showSnackBar(new SnackBar(
+              content: new Text(
+                  "Something went wrong, check your internet connection")));
         }
       });
     });
   }
-
 
   void _clearList() {
     setState(() {
@@ -56,8 +59,8 @@ abstract class AbstractSearchBookState<T extends StatefulWidget> extends State<T
   @override
   void initState() {
     super.initState();
-    subject.stream.debounce(new Duration(milliseconds: 600)).listen(_textChanged);
+    subject.stream
+        .debounce((_) => TimerStream(true, const Duration(milliseconds: 600)))
+        .listen(_textChanged);
   }
-
 }
-
